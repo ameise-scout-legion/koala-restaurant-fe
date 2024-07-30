@@ -28,3 +28,10 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Running
+#### Start project
+Install file **node_module**: use the command `yarn install`
+If dont have yarn, install `yarn` first, using command `npm install --global yarn`.After that, using `yarn --version` to check version make sure yarn installed 
+Start project: `yarn run dev`
+The project will host in port: `localhost:5173`
