@@ -11,33 +11,42 @@ import Layout from "../Layout";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import {
-  createUser,
-  deleteUser,
-  getAllUserByLocation,
-  updateUser,
-} from "../../apis/userApi";
 import { useLocation } from "../../hooks/locationHook";
 import ModalCreate from "./components/ModalCreate";
 import { CreateUserResponse } from "../../types/userType";
 import ModalUpdate from "./components/ModalUpdate";
+import {
+  createLocation,
+  deleteLocation,
+  getAllLocation,
+  updateLocation,
+} from "../../apis/locationApi";
+import {
+  createDishes,
+  deleteDishes,
+  getAllDishes,
+  updateDishes,
+} from "../../apis/dishesApi";
 
 interface DataType {
-  UserID: number;
-  Name: string;
-  Role: string;
-  ContactDetails: string | null;
-  Login: string;
+  DishName: string;
+  Description: string;
+  Price: number;
+  PreparationTime: string;
+  ImageLink: string;
   CreationDate: string;
   ModificationDate: string;
-  LocationID: number;
+  CategoryID: number;
+  CategoryName: string;
+  DishID: number;
 }
 
-const HomePage = () => {
+const Dishes = () => {
   const { Search } = Input;
   const { location } = useLocation();
   const [userData, setUserData] = useState([]);
   const [filteredUserData, setFilteredUserData] = useState<DataType[]>([]);
+  const [fileList, setFileList] = useState<any>([]);
   const [recordValue, setRecordValue] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,33 +56,43 @@ const HomePage = () => {
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Name",
-      dataIndex: "Name",
-      key: "name",
+      title: "Dish Name",
+      dataIndex: "DishName",
+      key: "dishName",
       render: (text: string) => <a>{text}</a>,
     },
     {
-      title: "User Name",
-      dataIndex: "Login",
-      key: "login",
+      title: "Description",
+      dataIndex: "Description",
+      key: "description",
       render: (text: string) => <a>{text}</a>,
     },
     {
-      title: "Role",
-      dataIndex: "Role",
-      key: "role",
+      title: "Price",
+      dataIndex: "Price",
+      key: "price",
     },
     {
-      title: "Contact Details",
-      dataIndex: "ContactDetails",
-      key: "contact",
-      render: (text: string) => <div>{text ? text : "Phone"}</div>,
+      title: "Preparation Time",
+      dataIndex: "PreparationTime",
+      key: "preparationTime",
+    },
+    {
+      title: "Image",
+      dataIndex: "ImageLink",
+      key: "image",
+      render: (text: string) => <img src={text} width={40} height={40} />,
     },
     {
       title: "Creation Date",
       dataIndex: "CreationDate",
       key: "date",
       render: (text: string) => <div>{moment(text).format("DD/MM/YYYY")}</div>,
+    },
+    {
+      title: "Category",
+      dataIndex: "CategoryName",
+      key: "category",
     },
     {
       title: "Action",
@@ -98,10 +117,10 @@ const HomePage = () => {
     },
   ];
 
-  const fetchUserData = async (locationID: number) => {
+  const fetchUserData = async () => {
     setLoading(true);
     try {
-      const res: any = await getAllUserByLocation(locationID);
+      const res: any = await getAllDishes();
       setUserData(res.data);
       setFilteredUserData(res.data);
     } catch (error: any) {
@@ -115,44 +134,53 @@ const HomePage = () => {
   };
 
   const handleCreate = async () => {
-    await form.validateFields();
-    const formValue = form.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
     try {
-      const res: CreateUserResponse | any = await createUser(payload);
-      setIsModalOpen(false);
+      await form.validateFields();
+      const values = form.getFieldsValue();
+      const formData = new FormData();
+
+      Object.keys(values).forEach((key) => {
+        formData.append(key, values[key]);
+      });
+
+      if (fileList.length > 0) {
+        formData.append("image", fileList[0].originFileObj);
+      }
+
+      const res: any = await createDishes(formData);
       if (res) {
         notification.success({
-          message: res?.data.message,
+          message: res?.data?.message,
         });
-      }
-      if (location) {
-        fetchUserData(location.LocationID);
+        setIsModalOpen(false);
+        form.resetFields();
+        setFileList([]);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
-        message: "Error creating user",
+        message: "Error creating dish",
         description: error.message,
       });
     }
   };
 
+  const handleUploadChange = ({ fileList }: any) => setFileList(fileList);
+
   const handleCancel = () => {
     setIsModalOpen(false);
     setIsModalUpdateOpen(false);
     setRecordValue(null);
+    setFileList([]);
   };
 
   const handleDeleteUser = async (record: DataType) => {
-    await deleteUser(record.UserID).then((res: any) => {
+    await deleteDishes(record.DishID).then((res: any) => {
       notification.success({
         message: res?.data.message,
       });
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     });
   };
@@ -163,34 +191,61 @@ const HomePage = () => {
   };
 
   const handleUpdate = async () => {
-    await formUpdate.validateFields();
-    const formValue = formUpdate.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
-
     try {
-      const res: CreateUserResponse | any = await updateUser(
-        recordValue.UserID,
-        payload
-      );
-      setIsModalUpdateOpen(false);
+      await formUpdate.validateFields();
+      const values = formUpdate.getFieldsValue();
+      const formData = new FormData();
+
+      Object.keys(values).forEach((key) => {
+        formData.append(key, values[key]);
+      });
+      if (fileList.length > 0) {
+        formData.append("image", fileList[0].originFileObj);
+      }
+
+      const res: any = await updateDishes(recordValue.DishID, formData);
       if (res) {
         notification.success({
-          message: res?.data.message,
+          message: res?.data?.message,
         });
-      }
-      if (location) {
-        fetchUserData(location.LocationID);
+        setIsModalUpdateOpen(false);
+        formUpdate.resetFields();
+        setFileList([]);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
-        message: "Error update user",
+        message: "Error update dish",
         description: error.message,
       });
     }
   };
+
+  // const handleUpdate = async () => {
+  //   await formUpdate.validateFields();
+  //   const payload = formUpdate.getFieldsValue();
+
+  //   try {
+  //     const res: CreateUserResponse | any = await updateLocation(
+  //       recordValue.LocationID,
+  //       payload
+  //     );
+  //     setIsModalUpdateOpen(false);
+  //     if (res) {
+  //       notification.success({
+  //         message: res?.data.message,
+  //       });
+  //     }
+  //     if (location) {
+  //       fetchUserData();
+  //     }
+  //   } catch (error: any) {
+  //     notification.error({
+  //       message: "Error update user",
+  //       description: error.message,
+  //     });
+  //   }
+  // };
 
   const handleSearch = (value: string) => {
     if (!value) {
@@ -198,8 +253,9 @@ const HomePage = () => {
     } else {
       const filteredData = userData.filter(
         (user: DataType) =>
-          user.Name.toLowerCase().includes(value.toLowerCase()) ||
-          user.Login.toLowerCase().includes(value.toLowerCase())
+          user.CategoryName.toLowerCase().includes(value.toLowerCase()) ||
+          user.DishName.toLowerCase().includes(value.toLowerCase()) ||
+          user.Description.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredUserData(filteredData);
     }
@@ -207,7 +263,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (location) {
-      fetchUserData(location.LocationID);
+      fetchUserData();
     }
   }, [location]);
 
@@ -221,7 +277,7 @@ const HomePage = () => {
             style={{ width: 500 }}
             onSearch={handleSearch}
           />
-          <Button onClick={() => setIsModalOpen(true)}>Create User</Button>
+          <Button onClick={() => setIsModalOpen(true)}>Create Dishes</Button>
         </div>
         <Table
           columns={columns}
@@ -235,6 +291,8 @@ const HomePage = () => {
         handleCancel={handleCancel}
         handleOk={handleCreate}
         isModalOpen={isModalOpen}
+        fileList={fileList}
+        handleUploadChange={handleUploadChange}
       />
       <ModalUpdate
         form={formUpdate}
@@ -242,9 +300,11 @@ const HomePage = () => {
         handleOk={handleUpdate}
         isModalOpen={isModalUpdateOpen}
         record={recordValue}
+        fileList={fileList}
+        handleUploadChange={handleUploadChange}
       />
     </Layout>
   );
 };
 
-export default HomePage;
+export default Dishes;

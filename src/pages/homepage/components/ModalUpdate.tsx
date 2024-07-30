@@ -22,7 +22,7 @@ const ModalUpdate = ({
     if (record) {
       form.setFieldsValue({
         name: record?.Name,
-        login: record?.Login,
+        login: record?.Login, 
         role: record?.Role,
       });
     }

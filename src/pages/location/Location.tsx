@@ -33,7 +33,7 @@ const Location = () => {
       <Card
         title="Select Location"
         bordered={false}
-        className="w-[600px] absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
+        className="w-[600px] absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] max-h-[680px] overflow-y-auto"
       >
         {loading && <Skeleton active paragraph={{ rows: 6 }} />}
         {locations.map((location, index) => {

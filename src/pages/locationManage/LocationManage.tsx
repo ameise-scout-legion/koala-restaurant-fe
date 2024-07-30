@@ -11,29 +11,29 @@ import Layout from "../Layout";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import {
-  createUser,
-  deleteUser,
-  getAllUserByLocation,
-  updateUser,
-} from "../../apis/userApi";
 import { useLocation } from "../../hooks/locationHook";
 import ModalCreate from "./components/ModalCreate";
 import { CreateUserResponse } from "../../types/userType";
 import ModalUpdate from "./components/ModalUpdate";
+import {
+  createLocation,
+  deleteLocation,
+  getAllLocation,
+  updateLocation,
+} from "../../apis/locationApi";
 
 interface DataType {
-  UserID: number;
-  Name: string;
-  Role: string;
-  ContactDetails: string | null;
-  Login: string;
+  Address: string;
+  City: string;
+  State: string;
+  ZipCode: string;
+  Country: string;
   CreationDate: string;
   ModificationDate: string;
   LocationID: number;
 }
 
-const HomePage = () => {
+const LocationManage = () => {
   const { Search } = Input;
   const { location } = useLocation();
   const [userData, setUserData] = useState([]);
@@ -47,27 +47,26 @@ const HomePage = () => {
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Name",
-      dataIndex: "Name",
-      key: "name",
+      title: "Address",
+      dataIndex: "Address",
+      key: "address",
       render: (text: string) => <a>{text}</a>,
     },
     {
-      title: "User Name",
-      dataIndex: "Login",
-      key: "login",
+      title: "City",
+      dataIndex: "City",
+      key: "city",
       render: (text: string) => <a>{text}</a>,
     },
     {
-      title: "Role",
-      dataIndex: "Role",
-      key: "role",
+      title: "State",
+      dataIndex: "State",
+      key: "state",
     },
     {
-      title: "Contact Details",
-      dataIndex: "ContactDetails",
-      key: "contact",
-      render: (text: string) => <div>{text ? text : "Phone"}</div>,
+      title: "ZipCode",
+      dataIndex: "ZipCode",
+      key: "zipcode",
     },
     {
       title: "Creation Date",
@@ -98,10 +97,10 @@ const HomePage = () => {
     },
   ];
 
-  const fetchUserData = async (locationID: number) => {
+  const fetchUserData = async () => {
     setLoading(true);
     try {
-      const res: any = await getAllUserByLocation(locationID);
+      const res: any = await getAllLocation();
       setUserData(res.data);
       setFilteredUserData(res.data);
     } catch (error: any) {
@@ -116,13 +115,10 @@ const HomePage = () => {
 
   const handleCreate = async () => {
     await form.validateFields();
-    const formValue = form.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
+    const payload = form.getFieldsValue();
+
     try {
-      const res: CreateUserResponse | any = await createUser(payload);
+      const res: CreateUserResponse | any = await createLocation(payload);
       setIsModalOpen(false);
       if (res) {
         notification.success({
@@ -130,7 +126,7 @@ const HomePage = () => {
         });
       }
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
@@ -147,12 +143,12 @@ const HomePage = () => {
   };
 
   const handleDeleteUser = async (record: DataType) => {
-    await deleteUser(record.UserID).then((res: any) => {
+    await deleteLocation(record.LocationID).then((res: any) => {
       notification.success({
         message: res?.data.message,
       });
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     });
   };
@@ -164,15 +160,11 @@ const HomePage = () => {
 
   const handleUpdate = async () => {
     await formUpdate.validateFields();
-    const formValue = formUpdate.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
+    const payload = formUpdate.getFieldsValue();
 
     try {
-      const res: CreateUserResponse | any = await updateUser(
-        recordValue.UserID,
+      const res: CreateUserResponse | any = await updateLocation(
+        recordValue.LocationID,
         payload
       );
       setIsModalUpdateOpen(false);
@@ -182,7 +174,7 @@ const HomePage = () => {
         });
       }
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
@@ -198,8 +190,9 @@ const HomePage = () => {
     } else {
       const filteredData = userData.filter(
         (user: DataType) =>
-          user.Name.toLowerCase().includes(value.toLowerCase()) ||
-          user.Login.toLowerCase().includes(value.toLowerCase())
+          user.Address.toLowerCase().includes(value.toLowerCase()) ||
+          user.City.toLowerCase().includes(value.toLowerCase()) ||
+          user.State.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredUserData(filteredData);
     }
@@ -207,7 +200,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (location) {
-      fetchUserData(location.LocationID);
+      fetchUserData();
     }
   }, [location]);
 
@@ -221,7 +214,7 @@ const HomePage = () => {
             style={{ width: 500 }}
             onSearch={handleSearch}
           />
-          <Button onClick={() => setIsModalOpen(true)}>Create User</Button>
+          <Button onClick={() => setIsModalOpen(true)}>Create Location</Button>
         </div>
         <Table
           columns={columns}
@@ -247,4 +240,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default LocationManage;

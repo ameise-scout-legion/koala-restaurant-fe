@@ -20,7 +20,7 @@ const Layout: FC<LayoutProps> = ({
     <AntdLayout className="min-h-full w-full bg-home-page bg-no-repeat bg-cover relative bg-white">
       <Header />
       <Navbar />
-      <AntdLayout className="pl-12 h-full bg-transparent">
+      <AntdLayout className="lg:pl-12 h-full bg-transparent">
         {children}
       </AntdLayout>
     </AntdLayout>
