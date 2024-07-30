@@ -2,13 +2,16 @@ import { Button, Card, Form, Input, notification } from "antd";
 import axiosClient from "../../apis/axiosClient";
 import { User, UserResponse } from "../../types/usersType";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState<boolean>(false);
   const handleLogin = (value: User) => {
+    setLoading(true);
     axiosClient.post("/user/login", value).then((res: UserResponse) => {
       localStorage.setItem("token", JSON.stringify(res.data.token));
+      setLoading(false);
       notification.success({
         message: "Login Success",
       });
@@ -52,7 +55,7 @@ const Login = () => {
             </Form.Item>
 
             <Form.Item className="m-0">
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={loading}>
                 Login
               </Button>
             </Form.Item>

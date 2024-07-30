@@ -29,7 +29,7 @@ const Header = () => {
         className="flex items-center"
       >
         <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
-        <div className="ml-2 ">{user?.username}</div>
+        <div className="ml-2">Welcome, {user?.username}</div>
       </Popover>
     </div>
   );

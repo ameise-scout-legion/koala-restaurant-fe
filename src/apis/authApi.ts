@@ -9,7 +9,7 @@ export const login = async (value: User) => {
     return response;
   } catch (error: any) {
     notification.error({
-        message: error?.response.data.message,
-      })
+      message: error?.response.data.message,
+    });
   }
 };
