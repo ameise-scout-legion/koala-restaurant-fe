@@ -14,3 +14,15 @@
 .navbar-menu .ant-menu-item-selected {
   background-color: green;
 }
+.ant-drawer-header {
+  background-color: #001529;
+  color: white;
+}
+.ant-drawer-close {
+  color: white !important;
+}
+.ant-drawer-body {
+  padding: 0 !important;
+  background-color: #001529;
+
+}

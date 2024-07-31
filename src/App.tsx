@@ -7,6 +7,8 @@ import Location from "./pages/location/Location";
 import { LocationProvider } from "./hooks/locationHook";
 import LocationManage from "./pages/locationManage/LocationManage";
 import Dishes from "./pages/dishes/Dishes";
+import Category from "./pages/category/Category";
+import Menu from "./pages/menu/Menu";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/location" element={<Location />} />
           <Route path="/location-manage" element={<LocationManage />} />
           <Route path="/dishes" element={<Dishes />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/menu" element={<Menu />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

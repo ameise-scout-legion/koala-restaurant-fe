@@ -1,18 +1,18 @@
 import { notification } from "antd";
 import axiosClient from "./axiosClient";
 
-export const getAllCategory = async () => {
+export const getAllMenu = async (id: number) => {
   try {
-    const response = await axiosClient.get(`/category`);
+    const response = await axiosClient.get(`/menu/location/${id}`);
 
     return response;
   } catch (error) {
     return error;
   }
 };
-export const createCategory = async (payload: any) => {
+export const createMenu = async (payload: any) => {
   try {
-    const response = await axiosClient.post("/category", payload);
+    const response = await axiosClient.post("/menu", payload);
 
     return response;
   } catch (error: any) {
@@ -21,9 +21,9 @@ export const createCategory = async (payload: any) => {
     });
   }
 };
-export const deleteCategory = async (id: number) => {
+export const deleteMenu = async (id: number) => {
   try {
-    const response = await axiosClient.delete(`/category/${id}`);
+    const response = await axiosClient.delete(`/menu/${id}`);
 
     return response;
   } catch (error: any) {
@@ -32,10 +32,10 @@ export const deleteCategory = async (id: number) => {
     });
   }
 };
-export const updateCategory = async (id: number, payload: any) => {
+export const updateMenu = async (id: number, payload: any) => {
   try {
     const response = await axiosClient.patch(
-      `/category/${id}`,
+      `/menu/${id}`,
       payload
     );
 

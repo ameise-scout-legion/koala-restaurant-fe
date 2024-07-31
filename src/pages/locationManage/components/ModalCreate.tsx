@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { Form, FormInstance, Input, Modal, Upload, Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Form, FormInstance, Input, Modal } from "antd";
 
 interface ModalProps {
   isModalOpen: boolean;
-  handleOk: (formData: FormData) => void;
+  handleOk: () => void;
   handleCancel: () => void;
   form: FormInstance;
 }
@@ -15,26 +13,11 @@ const ModalCreate = ({
   handleCancel,
   form,
 }: ModalProps) => {
-  const [fileList, setFileList] = useState([]);
-
-  const handleUploadChange = ({ fileList }) => setFileList(fileList);
-
   return (
     <Modal
       title="Create Location"
       open={isModalOpen}
-      onOk={() => {
-        form.validateFields().then((values) => {
-          const formData = new FormData();
-          fileList.forEach((file) => {
-            formData.append("file", file.originFileObj);
-          });
-          Object.keys(values).forEach((key) => {
-            formData.append(key, values[key]);
-          });
-          handleOk(formData);
-        });
-      }}
+      onOk={handleOk}
       okText="Create"
       onCancel={handleCancel}
     >
@@ -80,16 +63,6 @@ const ModalCreate = ({
           rules={[{ required: true, message: "Please input your country!" }]}
         >
           <Input />
-        </Form.Item>
-        <Form.Item label="Upload File" name="file">
-          <Upload
-            listType="picture"
-            fileList={fileList}
-            onChange={handleUploadChange}
-            beforeUpload={() => false} // Prevent automatic upload
-          >
-            <Button icon={<UploadOutlined />}>Select File</Button>
-          </Upload>
         </Form.Item>
       </Form>
     </Modal>

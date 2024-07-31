@@ -11,6 +11,24 @@ export const getAllUserByLocation = async (id: number | undefined) => {
     return error;
   }
 };
+export const getAllUser = async () => {
+  try {
+    const response = await axiosClient.get(`/owner/view-user`);
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+export const viewUser = async () => {
+  try {
+    const response = await axiosClient.get(`/user/view-profile`);
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
 export const createUser = async (payload: UserPayload) => {
   try {
     const response = await axiosClient.post("/owner/create-user", payload);

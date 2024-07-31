@@ -121,6 +121,7 @@ const LocationManage = () => {
       const res: CreateUserResponse | any = await createLocation(payload);
       setIsModalOpen(false);
       if (res) {
+        form.resetFields()
         notification.success({
           message: res?.data.message,
         });

@@ -13,14 +13,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useLocation } from "../../hooks/locationHook";
 import ModalCreate from "./components/ModalCreate";
-import { CreateUserResponse } from "../../types/userType";
 import ModalUpdate from "./components/ModalUpdate";
-import {
-  createLocation,
-  deleteLocation,
-  getAllLocation,
-  updateLocation,
-} from "../../apis/locationApi";
 import {
   createDishes,
   deleteDishes,
@@ -149,6 +142,7 @@ const Dishes = () => {
 
       const res: any = await createDishes(formData);
       if (res) {
+        form.resetFields()
         notification.success({
           message: res?.data?.message,
         });

@@ -1,12 +1,11 @@
 import { FC, useEffect, useState } from "react";
 import {
   AimOutlined,
-  BarChartOutlined,
-  FileOutlined,
   SettingOutlined,
   UserOutlined,
   MenuOutlined,
   StarOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { Menu, Drawer, Button } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -32,8 +31,11 @@ const Navbar: FC = () => {
       case "/dishes":
         setSelectedKey("3");
         break;
-      case "/menu":
+      case "/category":
         setSelectedKey("4");
+        break;
+      case "/menu":
+        setSelectedKey("5");
         break;
       default:
         setSelectedKey("");
@@ -59,7 +61,12 @@ const Navbar: FC = () => {
     {
       key: "4",
       icon: <SettingOutlined style={{ color: "white" }} />,
-      label: "Menu",
+      label: <Link to="/category">Category</Link>,
+    },
+    {
+      key: "5",
+      icon: <MenuUnfoldOutlined style={{ color: "white" }} />,
+      label: <Link to="/menu">Menu</Link>,
     },
   ];
 
@@ -105,6 +112,7 @@ const Navbar: FC = () => {
         placement="left"
         closable
         onClose={handleDrawerClose}
+        open={drawerVisible}
       >
         <Menu
           mode="inline"

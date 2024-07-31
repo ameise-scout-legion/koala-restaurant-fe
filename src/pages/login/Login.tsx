@@ -3,20 +3,44 @@ import axiosClient from "../../apis/axiosClient";
 import { User, UserResponse } from "../../types/usersType";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { viewUser } from "../../apis/userApi";
 
 const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
+
   const handleLogin = (value: User) => {
     setLoading(true);
-    axiosClient.post("/user/login", value).then((res: UserResponse) => {
-      localStorage.setItem("token", JSON.stringify(res.data.token));
-      setLoading(false);
-      notification.success({
-        message: "Login Success",
+    axiosClient
+      .post("/user/login", value)
+      .then((res: UserResponse) => {
+        const token = res.data.token;
+        localStorage.setItem("token", JSON.stringify(token));
+
+        return viewUser();
+      })
+      .then((res: any) => {
+        if (res?.data?.Role !== "Owner") {
+          setLoading(false);
+          notification.error({
+            message: "You don't have permission to login",
+          });
+          return;
+        }
+
+        setLoading(false);
+        notification.success({
+          message: "Login Success",
+        });
+        navigate("/location");
+      })
+      .catch((error) => {
+        setLoading(false);
+        notification.error({
+          message: "Login Failed",
+          description: error.message,
+        });
       });
-      navigate("/location");
-    });
   };
 
   return (

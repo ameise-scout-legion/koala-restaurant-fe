@@ -11,32 +11,34 @@ import Layout from "../Layout";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import {
-  createUser,
-  deleteUser,
-  getAllUserByLocation,
-  updateUser,
-} from "../../apis/userApi";
 import { useLocation } from "../../hooks/locationHook";
 import ModalCreate from "./components/ModalCreate";
 import { CreateUserResponse } from "../../types/userType";
 import ModalUpdate from "./components/ModalUpdate";
 
+import {
+  createCategory,
+  deleteCategory,
+  getAllCategory,
+  updateCategory,
+} from "../../apis/categoryApi";
+import { getAllUser } from "../../apis/userApi";
+
 interface DataType {
-  UserID: number;
   Name: string;
-  Role: string;
-  ContactDetails: string | null;
-  Login: string;
+  Description: string;
+  CreatedBy: number;
+  CategoryID: number;
   CreationDate: string;
   ModificationDate: string;
   LocationID: number;
 }
 
-const HomePage = () => {
+const Category = () => {
   const { Search } = Input;
   const { location } = useLocation();
   const [userData, setUserData] = useState([]);
+  const [allUserData, setAllUserData] = useState([]);
   const [filteredUserData, setFilteredUserData] = useState<DataType[]>([]);
   const [recordValue, setRecordValue] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -50,24 +52,24 @@ const HomePage = () => {
       title: "Name",
       dataIndex: "Name",
       key: "name",
-      render: (text: string) => <a>{text}</a>,
+      render: (text: string) => <div>{text}</div>,
     },
     {
-      title: "User Name",
-      dataIndex: "Login",
-      key: "login",
-      render: (text: string) => <a>{text}</a>,
+      title: "Description",
+      dataIndex: "Description",
+      key: "description",
+      render: (text: string) => <div>{text}</div>,
     },
     {
-      title: "Role",
-      dataIndex: "Role",
-      key: "role",
-    },
-    {
-      title: "Contact Details",
-      dataIndex: "ContactDetails",
-      key: "contact",
-      render: (text: string) => <div>{text ? text : "Phone"}</div>,
+      title: "CreatedBy",
+      dataIndex: "CreatedBy",
+      key: "createdBy",
+      render: (text: string) => {
+        const users: any = allUserData?.filter(
+          (user: any) => user.UserID === text
+        );
+        return <div>{users[0]?.Name}</div>;
+      },
     },
     {
       title: "Creation Date",
@@ -98,12 +100,12 @@ const HomePage = () => {
     },
   ];
 
-  const fetchUserData = async (locationID: number) => {
+  const fetchUserData = async () => {
     setLoading(true);
     try {
-      const res: any = await getAllUserByLocation(locationID);
-      setUserData(res.data);
-      setFilteredUserData(res.data);
+      const res: any = await getAllCategory();
+      setUserData(res.data.categories);
+      setFilteredUserData(res.data.categories);
     } catch (error: any) {
       notification.error({
         message: "Error fetching user data",
@@ -116,21 +118,19 @@ const HomePage = () => {
 
   const handleCreate = async () => {
     await form.validateFields();
-    const formValue = form.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
+    const payload = form.getFieldsValue();
+
     try {
-      const res: CreateUserResponse | any = await createUser(payload);
+      const res: CreateUserResponse | any = await createCategory(payload);
       setIsModalOpen(false);
       if (res) {
+        form.resetFields();
         notification.success({
           message: res?.data.message,
         });
       }
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
@@ -147,12 +147,12 @@ const HomePage = () => {
   };
 
   const handleDeleteUser = async (record: DataType) => {
-    await deleteUser(record.UserID).then((res: any) => {
+    await deleteCategory(record.CategoryID).then((res: any) => {
       notification.success({
         message: res?.data.message,
       });
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     });
   };
@@ -164,26 +164,21 @@ const HomePage = () => {
 
   const handleUpdate = async () => {
     await formUpdate.validateFields();
-    const formValue = formUpdate.getFieldsValue();
-    const payload = {
-      ...formValue,
-      locationID: location?.LocationID,
-    };
+    const payload = formUpdate.getFieldsValue();
 
     try {
-      const res: CreateUserResponse | any = await updateUser(
-        recordValue.UserID,
+      const res: CreateUserResponse | any = await updateCategory(
+        recordValue.CategoryID,
         payload
       );
       setIsModalUpdateOpen(false);
       if (res) {
-        form.resetFields();
         notification.success({
           message: res?.data.message,
         });
       }
       if (location) {
-        fetchUserData(location.LocationID);
+        fetchUserData();
       }
     } catch (error: any) {
       notification.error({
@@ -199,8 +194,8 @@ const HomePage = () => {
     } else {
       const filteredData = userData.filter(
         (user: DataType) =>
-          user.Name.toLowerCase().includes(value.toLowerCase()) ||
-          user.Login.toLowerCase().includes(value.toLowerCase())
+          user.Description.toLowerCase().includes(value.toLowerCase()) ||
+          user.Name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredUserData(filteredData);
     }
@@ -208,9 +203,13 @@ const HomePage = () => {
 
   useEffect(() => {
     if (location) {
-      fetchUserData(location.LocationID);
+      fetchUserData();
     }
   }, [location]);
+
+  useEffect(() => {
+    getAllUser().then((res: any) => setAllUserData(res.data));
+  }, []);
 
   return (
     <Layout>
@@ -222,7 +221,7 @@ const HomePage = () => {
             style={{ width: 500 }}
             onSearch={handleSearch}
           />
-          <Button onClick={() => setIsModalOpen(true)}>Create User</Button>
+          <Button onClick={() => setIsModalOpen(true)}>Create Category</Button>
         </div>
         <Table
           columns={columns}
@@ -248,4 +247,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Category;
