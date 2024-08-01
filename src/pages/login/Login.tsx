@@ -49,7 +49,7 @@ const Login = () => {
         <Card
           title="Login"
           bordered={false}
-          className="w-[500px] absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
+          className="sm:w-[500px] w-[310px] absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]"
         >
           <Form
             name="basic"
